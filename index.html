@@ -40,7 +40,7 @@
   }
   // 手動刪除
   function removeUserData(userId) {
-    const dbRef = ref(db, `${userId}`);
+    const dbRef = ref(db, `data/users/${userId}`);
     remove(dbRef);
   }
   // 手動取值
