@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase CRUD</title>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+  import { getDatabase, ref, set, onValue, update, get, child, remove, push } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    databaseURL: "",
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase();
+
+  // 手動全覆蓋
+  function writeUserData(userId, name, email, imageUrl) {
+    const newKey = push(child(ref(db), 'users')).key;
+    const dbRef = ref(db, `data/users/${userId}`);
+    set(dbRef, {
+      username: name,
+      email: email,
+      profile_picture: imageUrl,
+      id: newKey
+    });
+  }
+  // 手動刪除
+  function removeUserData(userId) {
+    const dbRef = ref(db, `${userId}`);
+    remove(dbRef);
+  }
+  // 手動取值
+  function getUserData(userId) {
+    const dbRef = ref(db, `data/users/${userId}`);
+    get(dbRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        document.getElementById("user-name").innerText = snapshot.val().username;
+        console.log(snapshot.val());
+      } else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+  // 手動更新但不覆蓋
+  function updateUserData(userId) {
+    const dbRef = ref(db, `data/users/${userId}`);
+    update(dbRef, {
+      phoneNumber: "0912345678"
+    });
+  }
+  // 自動監聽快取
+  function onValueUserData() {
+    const dbRef = ref(db, `data/users/`);
+    onValue(dbRef, (snapshot) => {
+      if (snapshot.exists()) {
+        document.getElementById("user-name").innerHTML = JSON.stringify(snapshot.val());
+        console.log(snapshot.val());
+      }
+    });
+  }
+  // 啟動自動監聽
+  onValueUserData()
+
+  const write_input = document.getElementById('write-input');
+  const get_input = document.getElementById('get-input');
+  const remove_input = document.getElementById('remove-input');
+  const update_input = document.getElementById('update-input');
+
+  const write_button = document.getElementById('write-button');
+  const get_button = document.getElementById('get-button');
+  const remove_button = document.getElementById('remove-button');
+  const update_button = document.getElementById('update-button');
+
+  write_button.addEventListener('click', () => {
+    const name = write_input.value;
+    if (name != '') {
+      writeUserData(name, name, `${name}@gmail.com`, `https://${name}.com`);
+    }
+  });
+
+  get_button.addEventListener('click', () => {
+    const name = get_input.value;
+    getUserData(name);
+  });
+
+  remove_button.addEventListener('click', () => {
+    const  name = remove_input.value;
+    removeUserData(name);
+  });
+
+  update_button.addEventListener('click', () => {
+    const  name = update_input.value;
+    updateUserData(name);
+  });
+</script>
+</head>
+<body>
+  <div id="container">
+    <div id="input-div">
+      <input type="text" id="write-input">
+      <button id="write-button">Write</button>
+    </div>
+    <div id="input-div">
+      <input type="text" id="get-input">
+      <button id="get-button">Get</button>
+    </div>
+    <div id="input-div">
+      <input type="text" id="remove-input">
+      <button id="remove-button">Remove</button>
+    </div>
+    <div id="input-div">
+      <input type="text" id="update-input">
+      <button id="update-button">Update</button>
+    </div>
+  </div>
+  <p id="user-name"></p>
+</body>
+</html>
