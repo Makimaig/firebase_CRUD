@@ -14,13 +14,7 @@
 
   // Your web app's Firebase configuration
   const firebaseConfig = {
-    databaseURL: "",
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
+
   };
 
   // Initialize Firebase
@@ -29,13 +23,13 @@
 
   // 手動全覆蓋
   function writeUserData(userId, name, email, imageUrl) {
-    const newKey = push(child(ref(db), 'users')).key;
+    // const newKey = push(child(ref(db), 'users')).key;
     const dbRef = ref(db, `data/users/${userId}`);
     set(dbRef, {
+      // id: newKey
       username: name,
       email: email,
       profile_picture: imageUrl,
-      id: newKey
     });
   }
   // 手動刪除
@@ -71,6 +65,8 @@
       if (snapshot.exists()) {
         document.getElementById("user-name").innerHTML = JSON.stringify(snapshot.val());
         console.log(snapshot.val());
+      } else {
+        document.getElementById("user-name").innerHTML = "No data available..";
       }
     });
   }
